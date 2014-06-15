@@ -109,22 +109,29 @@ namespace RSA_Cosole
                 if (nD > 0)
                 {
                     nArMessage = m_RSAHandler.Decrypt(nArCypher, nN, nD);
-                    Console.WriteLine("Show the decrypted file bytewise? <Y / AnyKey>");
-                    ConsoleKey ck = Console.ReadKey().Key;
-                    if (ck == ConsoleKey.Y)
+                    if (nArMessage != null)
                     {
-                        ShowInput(nArMessage);
+                        Console.WriteLine("Show the decrypted file bytewise? <Y / AnyKey>");
+                        ConsoleKey ck = Console.ReadKey().Key;
+                        if (ck == ConsoleKey.Y)
+                        {
+                            ShowInput(nArMessage);
+                        }
+                        else { /*Do not show*/}
+                        string strNewFile = m_FileHandler.GetNewFileName(strFile, "_Decrypted");
+                        try
+                        {
+                            m_FileHandler.WriteFile(strNewFile, nArMessage);
+                            Console.WriteLine("Decrypted file written: " + strNewFile);
+                        }
+                        catch
+                        {
+                            Console.WriteLine("Error while writing decrypted file: " + strNewFile);
+                        }
                     }
-                    else { /*Do not show*/}
-                    string strNewFile = m_FileHandler.GetNewFileName(strFile, "_Decrypted");
-                    try
+                    else
                     {
-                        m_FileHandler.WriteFile(strNewFile, nArMessage);
-                        Console.WriteLine("Decrypted file written: " + strNewFile);
-                    }
-                    catch
-                    {
-                        Console.WriteLine("Error while writing decrypted file: " + strNewFile);
+                        Console.WriteLine("Error while decrypted the file: \r\n" + strFile+ "\r\n\r\nIt doesn't seem te be an encryted file.\r\nPress any key to return to the main meue.");
                     }
                     Console.ReadKey();
                 }

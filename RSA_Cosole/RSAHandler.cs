@@ -73,14 +73,20 @@ namespace RSA_Cosole
         public byte[] Decrypt(byte[] nArCypher, int nN, int nD)
         {
             int[] nIntAr = ByteArToIntAr(nArCypher);
-            byte[] nArMessage = new byte[nIntAr.Length];
-
-            for (int i = 0; i < nIntAr.Length; i++)
+            byte[] nArMessage = null;
+            if (nIntAr != null)
             {
-                int nCur = (Int32)BigInteger.ModPow(nIntAr[i], nD, nN);//nM ^ nD % nN 
-                nArMessage[i] = Convert.ToByte(nCur);
-            }
+                nArMessage = new byte[nIntAr.Length];
 
+                for (int i = 0; i < nIntAr.Length; i++)
+                {
+                    int nCur = (Int32)BigInteger.ModPow(nIntAr[i], nD, nN);//nM ^ nD % nN 
+                    nArMessage[i] = Convert.ToByte(nCur%256);//%255 is neccessary because of the case of trying to decrypt with wrong keys nCur could be higher than 255 - overflow
+                }
+            }
+            else
+            {//Not a valid encrypted file                
+            }
             return nArMessage;
         }
         
@@ -250,9 +256,19 @@ namespace RSA_Cosole
         /// <returns>Int-Array</returns>
         public int[] ByteArToIntAr(byte[] nByteAr)
         {
+            
             int[] nIntAr = new int[nByteAr.Length / 4];
-            for (int i = 0; i < nByteAr.Length; i += 4)
-                nIntAr[i / 4] = BitConverter.ToInt32(nByteAr, i);
+            try
+            {
+                for (int i = 0; i < nByteAr.Length; i += 4)
+                {
+                    nIntAr[i / 4] = BitConverter.ToInt32(nByteAr, i);
+                }
+            }
+            catch
+            {//Error in bitconverter
+                nIntAr = null;
+            }
             return nIntAr;
         } 
         #endregion
